@@ -1,5 +1,18 @@
 # A devoted friend with ipfs + peerjs
 
+## how to run
+
+```bash
+git clone https://github.com/naratteu/ipfspeerjsfriend
+cd ipfspeerjsfriend
+
+pkg install kubo # termux
+nohup ipfs daemon &
+nohup go run main.go &
+```
+
+##
+
 https://codepen.io/naratteu/pen/wvLjOMP 여기서 콘솔로 아래명령으로 접속 테스트
 
 ```js
