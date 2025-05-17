@@ -45,7 +45,7 @@ func main() {
 	defer p.Close()
 	defer log.Println("종료댐.", p.ID)
 	log.Printf("%s 로 됫어용\n", p.ID)
-	reset, end := taskCompletionSource[string](time.Second * 5) // 1시간마다 아무일 없어도 리셋
+	reset, end := taskCompletionSource[string](time.Hour) // 1시간마다 아무일 없어도 리셋
 	nevs.Connection = connection
 	nevs.Disconnected = end
 	<-reset
@@ -70,22 +70,23 @@ func connection(conn *peer.DataConnection) {
 
 		str := bp.UnpackStr(bin)
 
-		cmd_add := "ipfs add -Q #"
-		cmd_ps := "ps -Ao cmd #ipfs"
-
+		const (
+			cmd_add     = "ipfs add -Q #"
+			cmd_ps      = "ps -Ao cmd #ipfs"
+			cmd_provide = "ipfs routing provide "
+		)
 		res, err := "unknown command", error(nil)
 		switch {
 		case strings.HasPrefix(str, cmd_add):
 			document := strings.TrimPrefix(str, cmd_add)
 			res, err = script.Echo(document).Exec(cmd_add).String()
-			if err != nil {
-				res = err.Error()
-			}
 		case strings.HasPrefix(str, cmd_ps):
 			res, err = script.Exec(cmd_ps).Match("ipfs").String()
-			if err != nil {
-				res = err.Error()
-			}
+		case strings.HasPrefix(str, cmd_provide):
+			res, err = script.Exec(str).String()
+		}
+		if err != nil {
+			res = err.Error()
 		}
 		conn.Send(bp.PackStr(res), false)
 	})

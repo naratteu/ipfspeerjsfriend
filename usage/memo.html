@@ -5,19 +5,30 @@
 </head>
 
 <body>
-    <textarea>안녕하세요 제이름은 naratteu</textarea>
+    <textarea>다람쥐 헌 쳇바퀴에 타고파</textarea>
     <button onclick='usercopy()'>share</button>
     <script>
+        const log = new Proxy({}, {
+            set(_, name, msg) { console.log(`${name}: ${msg}`); }
+        });
         async function usercopy() {
             const p = new Peer();
-            await new Promise(r => p.on("open", r));
-            c = p.connect("ipfspeerjsfriend");
-            await new Promise(r => c.on("open", r));
+            log["peerjs start"] = await new Promise(r => p.on("open", r));
+            c = p.connect(log["connect.."] = "ipfspeerjsfriend");
+            log["connected"] = await new Promise(r => c.on("open", r));
 
-            c.on("data", cid => { prompt("복사해가세용", "https://ipfs.io/ipfs/" + cid); })
-            const raw = document.querySelector("textarea").value;
-            c.send("ipfs add -Q #" + raw);
+            c.send(log["send"] = "ipfs add -Q #" + document.querySelector("textarea").value);
+            const cid = log["cid"] = (await new Promise(r => c.on("data", r))).trim();
+
+            c.send(log["send"] = "ipfs routing provide " + cid);
+            log["done"] = await new Promise(r => c.on("data", r));
+
+            prompt("복사해가세용", log["url"] = "https://ipfs.io/ipfs/" + cid);
         }
+    </script>
+    <script type="module">
+        import domConsole from "https://esm.sh/dom-console";
+        domConsole().api.toggle()
     </script>
 </body>
 

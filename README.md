@@ -1,35 +1,21 @@
 # A devoted friend with ipfs + peerjs
 
-## how to run
+## How to run
 
 ```bash
+pkg install git go kubo # termux
+git version # git version 2.49.0
+go version # go version go1.24.2 android/arm
+ipfs version # ipfs version 0.34.1
+
 git clone https://github.com/naratteu/ipfspeerjsfriend
 cd ipfspeerjsfriend
 
-pkg install kubo # termux
+chmod 777 ./loop.sh
+nohup ./loop.sh &
 nohup ipfs daemon &
-nohup go run main.go &
 ```
 
-##
+## Usage
 
-https://codepen.io/naratteu/pen/wvLjOMP 여기서 콘솔로 아래명령으로 접속 테스트
-
-```js
-p = new Peer(); await new Promise(r => setTimeout(r, 1000));
-c = p.connect("ipfspeerjsfriend"); await new Promise(r => setTimeout(r, 2000));
-c.on("data", (data)=>{console.log("https://ipfs.io/ipfs/"+data);})
-c.send("ipfs add -Q #똠얌꿍");
-
-# res: https://ipfs.io/ipfs/QmNMtgcdKRwVa8dqBTo2e3oixvbViWJSACc5KogQ78JnuD
-```
-
-```js
-p = new Peer(); await new Promise(r => setTimeout(r, 1000));
-c = p.connect("ipfspeerjsfriend"); await new Promise(r => setTimeout(r, 2000));
-c.on("data", (data)=>{console.log(data);})
-c.send("ps -o cmd | grep ipfs #");
-undefined
-
-# res: ipfs daemon
-```
+- [memo example](https://naratteu.github.io/ipfspeerjsfriend/usage/memo.html)
