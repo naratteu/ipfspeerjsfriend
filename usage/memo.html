@@ -1,0 +1,24 @@
+<html>
+
+<head>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+</head>
+
+<body>
+    <textarea>안녕하세요 제이름은 naratteu</textarea>
+    <button onclick='usercopy()'>share</button>
+    <script>
+        async function usercopy() {
+            const p = new Peer();
+            await new Promise(r => p.on("open", r));
+            c = p.connect("ipfspeerjsfriend");
+            await new Promise(r => c.on("open", r));
+
+            c.on("data", cid => { prompt("복사해가세용", "https://ipfs.io/ipfs/" + cid); })
+            const raw = document.querySelector("textarea").value;
+            c.send("ipfs add -Q #" + raw);
+        }
+    </script>
+</body>
+
+</html>
