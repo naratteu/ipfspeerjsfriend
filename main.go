@@ -15,46 +15,40 @@ import (
 )
 
 func main() {
-	for {
-		func() {
-			newPeer := func(id string, opts *peer.Options) (*peer.Peer, *exts.NamedEvents) {
-				log.Printf("%s 로 시도해볼게용\n", id)
-				p, err := peer.NewPeer(id, *opts)
-				if err != nil {
-					panic(err)
-				}
-				ok, end := taskCompletionSource[bool](2 * time.Second)
-				nevs := &exts.NamedEvents{}
-				nevs.Open = func(id string) { end(true) }
-				nevs.Error = func(err peer.PeerError) { end(false) }
-				defer func() {
-					nevs.Open = nil
-					nevs.Error = nil
-				}()
-				nevs.Join(p, evLog)
-				if <-ok {
-					return p, nevs
-				} else {
-					p.Close()
-					return nil, nil
-				}
-			}
-			opts := peer.NewOptions()
-			p, nevs := newPeer("ipfspeerjsfriend", &opts)
-			for i := 0; p == nil; i++ {
-				p, nevs = newPeer(fmt.Sprintf("ipfspeerjsfriend%d", i), &opts)
-			}
-			defer p.Close()
-			defer log.Println("종료댐.", p.ID)
-			log.Printf("%s 로 됫어용\n", p.ID)
-			reset, end := taskCompletionSource[string](time.Hour) // 1시간마다 아무일 없어도 리셋
-			nevs.Connection = connection
-			nevs.Disconnected = end
-			<-reset
+	newPeer := func(id string, opts *peer.Options) (*peer.Peer, *exts.NamedEvents) {
+		log.Printf("%s 로 시도해볼게용\n", id)
+		p, err := peer.NewPeer(id, *opts)
+		if err != nil {
+			panic(err)
+		}
+		ok, end := taskCompletionSource[bool](2 * time.Second)
+		nevs := &exts.NamedEvents{}
+		nevs.Open = func(id string) { end(true) }
+		nevs.Error = func(err peer.PeerError) { end(false) }
+		defer func() {
+			nevs.Open = nil
+			nevs.Error = nil
 		}()
-		log.Println("1분 뒤에 재시작 할게요..")
-		time.Sleep(time.Minute) // 네트워크나 몬가 문제가 있었겠거니 하고 1분후에 다시시작
+		nevs.Join(p, evLog)
+		if <-ok {
+			return p, nevs
+		} else {
+			p.Close()
+			return nil, nil
+		}
 	}
+	opts := peer.NewOptions()
+	p, nevs := newPeer("ipfspeerjsfriend", &opts)
+	for i := 0; p == nil; i++ {
+		p, nevs = newPeer(fmt.Sprintf("ipfspeerjsfriend%d", i), &opts)
+	}
+	defer p.Close()
+	defer log.Println("종료댐.", p.ID)
+	log.Printf("%s 로 됫어용\n", p.ID)
+	reset, end := taskCompletionSource[string](time.Second * 5) // 1시간마다 아무일 없어도 리셋
+	nevs.Connection = connection
+	nevs.Disconnected = end
+	<-reset
 }
 
 func taskCompletionSource[T any](timeout time.Duration) (<-chan T, func(T)) {
