@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	exts "ipfspeerjsfriend/peerjs_extensions"
-	bp "ipfspeerjsfriend/peerjs_js_binarypack"
+	exts "github.com/naratteu/ipfspeerjsfriend/peerjs_extensions"
+	bp "github.com/naratteu/ipfspeerjsfriend/peerjs_js_binarypack"
 
 	"github.com/bitfield/script"
 	peer "github.com/muka/peerjs-go"
